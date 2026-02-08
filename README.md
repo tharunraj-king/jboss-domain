@@ -10,36 +10,51 @@ A production-ready WildFly/JBoss EAP domain mode cluster running in Docker conta
 ![Java](https://img.shields.io/badge/Java-17+-red?logo=openjdk)
 ![Nginx](https://img.shields.io/badge/Nginx-Load%20Balancer-009639?logo=nginx)
 
+## 💡 Project Goal & Context
+
+**TL;DR:** This is an **Infrastructure & Orchestration** project — I focused on Docker patterns, not JBoss internals.
+
+This project serves as a **Reference Architecture** for containerizing legacy middleware. The goal was to solve the challenge of running **JBoss/WildFly Domain Mode**—originally designed for static VMs—inside a dynamic **Docker environment**.
+
+**Key Challenges Solved:**
+- **Dynamic Host Registration:** Workers waiting for Domain Controller via health checks
+- **Network Topology:** Docker DNS for JBoss management interfaces, app ports behind load balancer
+- **Session Affinity:** Sticky sessions at Nginx layer for stateful Jakarta EE apps
+
 ## 🏗️ Architecture
 
 ```
-                    ┌─────────────┐
-                    │   NGINX     │
-                    │   (LB:80)   │
-                    └──────┬──────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│   Worker 1    │  │   Worker 2    │  │   Worker 3    │
-│  (server-one) │  │  (server-one) │  │  (server-one) │
-└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
-        │                  │                  │
-        └──────────────────┼──────────────────┘
+                         External
+                     ┌─────────────┐
+           :80 ────▶ │   NGINX     │
+                     │    (LB)     │
+                     └──────┬──────┘
+                            │
+       ┌────────────────────┼────────────────────┐
+       │                    │                    │
+       ▼                    ▼                    ▼
+ ┌───────────┐       ┌───────────┐       ┌───────────┐
+ │  Worker 1 │       │  Worker 2 │       │  Worker 3 │
+ │  (350MB)  │       │  (350MB)  │       │  (350MB)  │
+ └─────┬─────┘       └─────┬─────┘       └─────┬─────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
                            │
                     ┌──────┴──────┐
-                    │   Domain    │
+          :9990 ──▶ │   Domain    │
                     │  Controller │
-                    │  (Primary)  │
-                    │   :9990     │
+                    │   (256MB)   │
                     └─────────────┘
+                    
+             [ wf-cluster bridge network ]
 ```
+
+**Resource Requirements:** ~1.3GB RAM total (256MB primary + 350MB × 3 workers)
 
 ## ✨ Features
 
 - **Domain Mode Clustering** - Centralized management of multiple WildFly instances
-- **Load Balancing** - NGINX round-robin load balancer
+- **Load Balancing** - NGINX with sticky sessions (ip_hash)
 - **Auto-Deployment** - Drop WAR files in `master/deployments/` for automatic deployment
 - **Full Monitoring** - EJB, JMS, Undertow, Transactions, DataSources statistics enabled
 - **JMS Messaging** - ActiveMQ Artemis with pre-configured queues
@@ -56,8 +71,8 @@ A production-ready WildFly/JBoss EAP domain mode cluster running in Docker conta
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/wildfly-docker-cluster.git
-cd wildfly-docker-cluster
+git clone https://github.com/tharunraj-king/jboss-domain.git
+cd jboss-domain
 
 # Build and start
 docker-compose up -d --build
