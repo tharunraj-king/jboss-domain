@@ -1,0 +1,9 @@
+# Auto-deploy all WAR files from /tmp/deployments
+# This script runs in embedded mode during Docker build
+
+embed-host-controller --domain-config=domain.xml --host-config=host-primary.xml
+
+# Deploy all WAR files to the main-server-group
+# The deployments are copied to /tmp/deployments and deployed here
+
+stop-embedded-host-controller

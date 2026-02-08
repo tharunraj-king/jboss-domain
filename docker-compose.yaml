@@ -1,0 +1,96 @@
+services:
+  # --- Domain Controller ---
+  domain-primary:
+    build: ./master
+    hostname: primary
+    image: wildfly-domain-master-custom
+    environment:
+      - JAVA_OPTS=-Xms64m -Xmx256m -Djava.net.preferIPv4Stack=true
+    # Ensure this port is exposed so workers can find it!
+    ports:
+      - "9990:9990"
+    command: /opt/jboss/wildfly/start-with-deploy.sh
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9990/management | grep -q '401' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+    networks:
+      - wf-cluster
+
+  # --- Worker Node 1 ---
+  worker1:
+    build: ./worker
+    image: wildfly-domain-worker-custom
+    depends_on:
+      domain-primary:
+        condition: service_healthy
+    environment:
+      - JBOSS_HOST_NAME=worker1
+      - JAVA_OPTS=-Xms64m -Xmx350m -Djava.net.preferIPv4Stack=true
+    # CLEAN COMMAND: No sed, no hacks. Just the startup flags.
+    command: >
+      /opt/jboss/wildfly/bin/domain.sh 
+      --host-config=host-secondary.xml 
+      -Djboss.domain.primary.address=domain-primary 
+      -Djboss.bind.address=0.0.0.0 
+      -Djboss.bind.address.management=0.0.0.0 
+    networks:
+      - wf-cluster
+
+  # --- Worker Node 2 ---
+  worker2:
+    build: ./worker
+    image: wildfly-domain-worker-custom
+    depends_on:
+      domain-primary:
+        condition: service_healthy
+    environment:
+      - JBOSS_HOST_NAME=worker2
+      - JAVA_OPTS=-Xms64m -Xmx350m -Djava.net.preferIPv4Stack=true
+    command: >
+      /opt/jboss/wildfly/bin/domain.sh 
+      --host-config=host-secondary.xml 
+      -Djboss.domain.primary.address=domain-primary 
+      -Djboss.bind.address=0.0.0.0 
+      -Djboss.bind.address.management=0.0.0.0 
+    networks:
+      - wf-cluster
+
+  # --- Worker Node 3 ---
+  worker3:
+    build: ./worker
+    image: wildfly-domain-worker-custom
+    depends_on:
+      domain-primary:
+        condition: service_healthy
+    environment:
+      - JBOSS_HOST_NAME=worker3
+      - JAVA_OPTS=-Xms64m -Xmx350m -Djava.net.preferIPv4Stack=true
+    command: >
+      /opt/jboss/wildfly/bin/domain.sh 
+      --host-config=host-secondary.xml 
+      -Djboss.domain.primary.address=domain-primary 
+      -Djboss.bind.address=0.0.0.0 
+      -Djboss.bind.address.management=0.0.0.0 
+    networks:
+      - wf-cluster
+
+  # --- Load Balancer ---
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - worker1
+      - worker2
+      - worker3
+    networks:
+      - wf-cluster
+
+networks:
+  wf-cluster:
+    driver: bridge

@@ -1,0 +1,50 @@
+# Compiled files
+*.class
+*.jar
+!master/deployments/*.war
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+.m2/
+?/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# WildFly
+standalone/data/
+standalone/log/
+standalone/tmp/
+domain/data/
+domain/log/
+domain/tmp/
+domain/servers/
+*_xml_history/
+
+# Environment
+.env
+*.env.local
+
+# Misc
+failed,
+true
+WFLYCTL*

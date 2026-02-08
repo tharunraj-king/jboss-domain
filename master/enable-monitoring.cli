@@ -1,0 +1,33 @@
+# Enable all monitoring/statistics for WildFly domain mode
+# This script runs in embedded mode during Docker build
+
+embed-host-controller --domain-config=domain.xml --host-config=host-primary.xml
+
+# Undertow (Web/HTTP) statistics
+/profile=full/subsystem=undertow:write-attribute(name=statistics-enabled,value=true)
+
+# EJB3 statistics
+/profile=full/subsystem=ejb3:write-attribute(name=statistics-enabled,value=true)
+
+# Messaging/JMS (ActiveMQ Artemis) statistics
+/profile=full/subsystem=messaging-activemq/server=default:write-attribute(name=statistics-enabled,value=true)
+
+# Transaction statistics
+/profile=full/subsystem=transactions:write-attribute(name=enable-statistics,value=true)
+
+# DataSource statistics
+/profile=full/subsystem=datasources/data-source=ExampleDS:write-attribute(name=statistics-enabled,value=true)
+
+# WebServices statistics
+/profile=full/subsystem=webservices:write-attribute(name=statistics-enabled,value=true)
+
+# Infinispan cache statistics
+/profile=full/subsystem=infinispan/cache-container=ejb:write-attribute(name=statistics-enabled,value=true)
+/profile=full/subsystem=infinispan/cache-container=web:write-attribute(name=statistics-enabled,value=true)
+/profile=full/subsystem=infinispan/cache-container=hibernate:write-attribute(name=statistics-enabled,value=true)
+/profile=full/subsystem=infinispan/cache-container=server:write-attribute(name=statistics-enabled,value=true)
+
+# --- JMS Queue for Demo Application ---
+/profile=full/subsystem=messaging-activemq/server=default/jms-queue=DemoQueue:add(entries=["java:/jms/queue/DemoQueue", "java:jboss/exported/jms/queue/DemoQueue"])
+
+stop-embedded-host-controller

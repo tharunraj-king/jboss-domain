@@ -1,0 +1,8 @@
+# WildFly CLI script to configure JMS Queue
+# Run this on the domain controller
+
+# Add the JMS queue to the full profile (used by main-server-group)
+/profile=full/subsystem=messaging-activemq/server=default/jms-queue=DemoQueue:add(entries=["java:/jms/queue/DemoQueue", "java:jboss/exported/jms/queue/DemoQueue"])
+
+# Reload the server group to apply changes
+/server-group=main-server-group:reload-servers
