@@ -2,10 +2,13 @@
 
 A production-ready WildFly/JBoss EAP domain mode cluster running in Docker containers with load balancing, EJB, and JMS messaging.
 
-![WildFly](https://img.shields.io/badge/WildFly-39.0.0-yellow)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue)
-![Jakarta EE](https://img.shields.io/badge/Jakarta%20EE-10-orange)
+<!-- Static Badges -->
+![WildFly](https://img.shields.io/badge/WildFly-39.0.0-yellow?logo=redhat)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker)
+![Jakarta EE](https://img.shields.io/badge/Jakarta%20EE-10-orange?logo=eclipse)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Java](https://img.shields.io/badge/Java-17+-red?logo=openjdk)
+![Nginx](https://img.shields.io/badge/Nginx-Load%20Balancer-009639?logo=nginx)
 
 ## 🏗️ Architecture
 
