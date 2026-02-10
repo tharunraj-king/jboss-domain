@@ -30,4 +30,7 @@ embed-host-controller --domain-config=domain.xml --host-config=host-primary.xml
 # --- JMS Queue for Demo Application ---
 /profile=full/subsystem=messaging-activemq/server=default/jms-queue=DemoQueue:add(entries=["java:/jms/queue/DemoQueue", "java:jboss/exported/jms/queue/DemoQueue"])
 
+# --- JMS Topic for Demo Application ---
+/profile=full/subsystem=messaging-activemq/server=default/jms-topic=DemoTopic:add(entries=["java:/jms/topic/DemoTopic", "java:jboss/exported/jms/topic/DemoTopic"])
+
 stop-embedded-host-controller

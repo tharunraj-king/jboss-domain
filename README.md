@@ -222,6 +222,22 @@ The included `ejb-jms-app` demonstrates:
 - **Message-Driven Bean** - Asynchronously processes queue messages
 - **Servlets** - Web interface to test EJB and JMS
 
+## 📚 Sample App Topics
+
+- **Overview:** The `ejb-jms-app` is a minimal Jakarta EE 10 sample demonstrating EJBs, JMS messaging (Artemis), and simple servlet-based UIs to exercise the app.
+- **Endpoints:**
+  - `GET /ejb-jms-app/ejb` — exercise the `CalculatorBean` via servlet
+  - `GET /ejb-jms-app/jms` — send a JMS message via the JMS producer servlet
+  - `GET /ejb-jms-app/` — app home page (simple UI)
+- **Components:** Stateless session beans, a JMS producer, a Message-Driven Bean (MDB), and a few test servlets under `src/main/java` and `src/main/webapp`.
+- **Build & Run:** Build with `mvn clean package` and copy the produced WAR to `master/deployments/` (or use the included pre-built WAR in `master/deployments/`).
+- **Test Examples:**
+  - Exercise EJB: `curl http://localhost/ejb-jms-app/ejb`
+  - Exercise JMS: `curl http://localhost/ejb-jms-app/jms`
+  - View server logs: `docker logs -f jboss-1-worker1-1`
+- **Extending the Sample:** Add new EJBs or JMS queues, then update `master/enable-monitoring.cli` for queue definitions and drop the WAR into `master/deployments/`.
+- **Troubleshooting:** If servlet calls fail, check the domain controller deployments via `jboss-cli.sh` and verify JMS queues exist using the Admin Console or CLI.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
